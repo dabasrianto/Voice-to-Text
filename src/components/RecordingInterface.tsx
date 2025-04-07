@@ -76,6 +76,8 @@ const RecordingInterface = ({
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = language;
+    recognition.maxAlternatives = 3;
+    recognition.interimResults = true;
 
     recognition.onstart = () => {
       setIsRecording(true);
@@ -88,10 +90,14 @@ const RecordingInterface = ({
       let finalTranscript = "";
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
+        // Get the most confident alternative
         const transcript = event.results[i][0].transcript;
+
         if (event.results[i].isFinal) {
-          finalTranscript += transcript + " ";
-          finalTranscriptRef.current += transcript + " ";
+          // Add a space only if the transcript doesn't end with punctuation
+          const needsSpace = !transcript.trim().match(/[.!?,;:]$/);
+          finalTranscript += transcript + (needsSpace ? " " : "");
+          finalTranscriptRef.current += transcript + (needsSpace ? " " : "");
         } else {
           interimTranscript += transcript;
         }

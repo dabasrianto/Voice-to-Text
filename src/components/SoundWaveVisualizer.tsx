@@ -60,6 +60,7 @@ const SoundWaveVisualizer = ({
       );
     }
 
+    // Only keep the sound-reactive animations
     switch (currentAnimationType) {
       case "circle":
         return (
@@ -72,94 +73,6 @@ const SoundWaveVisualizer = ({
       case "pulse":
         return (
           <PulseAnimation
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie":
-        return (
-          <LottieAnimation
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie1":
-        return (
-          <LottieAnimation1
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie2":
-        return (
-          <LottieAnimation2
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie3":
-        return (
-          <LottieAnimation3
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie4":
-        return (
-          <LottieAnimation4
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie5":
-        return (
-          <LottieAnimation5
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie6":
-        return (
-          <LottieAnimation6
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie7":
-        return (
-          <LottieAnimation7
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie8":
-        return (
-          <LottieAnimation8
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie9":
-        return (
-          <LottieAnimation9
-            isRecording={isRecording}
-            audioLevel={audioLevel}
-            isPaused={isPaused}
-          />
-        );
-      case "lottie10":
-        return (
-          <LottieAnimation10
             isRecording={isRecording}
             audioLevel={audioLevel}
             isPaused={isPaused}
