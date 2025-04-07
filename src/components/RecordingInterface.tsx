@@ -15,14 +15,18 @@ import SoundWaveVisualizer from "./SoundWaveVisualizer";
 
 interface RecordingInterfaceProps {
   isRecording?: boolean;
-  onTranscriptionComplete?: (text: string) => void;
+  onTranscriptionComplete?: (text: string, title?: string) => void;
   defaultLanguage?: string;
+  animationType?: string;
+  textSize?: string;
 }
 
 const RecordingInterface = ({
   isRecording: externalIsRecording,
   onTranscriptionComplete = () => {},
   defaultLanguage = "id-ID",
+  animationType = "wave",
+  textSize = "text-md",
 }: RecordingInterfaceProps) => {
   const [isRecording, setIsRecording] = useState(externalIsRecording || false);
   const [isPaused, setIsPaused] = useState(false);
@@ -33,6 +37,7 @@ const RecordingInterface = ({
   const [audioLevel, setAudioLevel] = useState(0.5);
   const [isWebSpeechSupported, setIsWebSpeechSupported] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [recordingTitle, setRecordingTitle] = useState("");
 
   // References
   const micButtonRef = useRef<HTMLButtonElement>(null);
@@ -292,9 +297,20 @@ const RecordingInterface = ({
     setIsRecording(false);
     setIsPaused(false);
 
+    // Generate a default title if none is provided
+    const title =
+      recordingTitle.trim() ||
+      `Recording ${new Date().toLocaleString(language.split("-")[0], {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
+
     // Notify parent component about the completed transcription
-    onTranscriptionComplete(finalTranscriptRef.current.trim());
+    onTranscriptionComplete(finalTranscriptRef.current.trim(), title);
     setIsLoading(false);
+    setRecordingTitle(""); // Reset title for next recording
   };
 
   const handleLanguageChange = (value: string) => {
@@ -303,7 +319,7 @@ const RecordingInterface = ({
 
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto p-4 bg-background rounded-xl shadow-lg">
-      <div className="w-full mb-6">
+      <div className="w-full mb-4">
         <Select value={language} onValueChange={handleLanguageChange}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select language" />
@@ -318,11 +334,24 @@ const RecordingInterface = ({
         </Select>
       </div>
 
+      {isRecording && (
+        <div className="w-full mb-4">
+          <input
+            type="text"
+            value={recordingTitle}
+            onChange={(e) => setRecordingTitle(e.target.value)}
+            placeholder="Enter recording title (optional)"
+            className="w-full p-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+      )}
+
       <div className="relative w-full h-32 mb-6">
         <SoundWaveVisualizer
           isRecording={isRecording}
           isPaused={isPaused}
           audioLevel={audioLevel}
+          animationType={animationType}
         />
       </div>
 
@@ -388,7 +417,7 @@ const RecordingInterface = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="text-md text-foreground"
+            className={`${textSize} text-foreground`}
           >
             {transcription}
           </motion.p>

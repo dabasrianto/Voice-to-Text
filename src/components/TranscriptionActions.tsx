@@ -9,6 +9,19 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { Copy, Share2, Save, Edit, Mic } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCopy,
+  faShare,
+  faSave,
+  faEdit,
+  faMicrophone,
+  faClipboard,
+  faShareAlt,
+  faBookmark,
+  faPencilAlt,
+  faMicrophoneAlt,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   Dialog,
   DialogContent,
@@ -19,25 +32,35 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
+import { Switch } from "./ui/switch";
 
 interface TranscriptionActionsProps {
   transcriptionText?: string;
+  recordingTitle?: string;
   onCopy?: () => void;
   onShare?: () => void;
   onSave?: () => void;
   onEdit?: (text: string) => void;
   onNewRecording?: () => void;
+  textSize?: string;
+  useCustomIcons?: boolean;
+  iconColor?: string;
 }
 
 const TranscriptionActions = ({
   transcriptionText = "",
+  recordingTitle = "",
   onCopy = () => {},
   onShare = () => {},
   onSave = () => {},
   onEdit = () => {},
   onNewRecording = () => {},
+  textSize = "text-md",
+  useCustomIcons = false,
+  iconColor = "text-white",
 }: TranscriptionActionsProps) => {
   const [editedText, setEditedText] = useState(transcriptionText);
+  const [editedTitle, setEditedTitle] = useState(recordingTitle);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isSaveSuccess, setIsSaveSuccess] = useState(false);
   const [isCopySuccess, setIsCopySuccess] = useState(false);
@@ -55,7 +78,7 @@ const TranscriptionActions = ({
     if (navigator.share && transcriptionText) {
       navigator
         .share({
-          title: "Voice Transcription",
+          title: recordingTitle || "Voice Transcription",
           text: transcriptionText,
         })
         .catch((err) => {
@@ -85,6 +108,7 @@ const TranscriptionActions = ({
       const newTranscription = {
         id: Date.now().toString(),
         text: transcriptionText,
+        title: recordingTitle || `Recording ${new Date().toLocaleString()}`,
         date: new Date().toISOString().split("T")[0],
         language: navigator.language || "en-US",
         duration: "N/A", // In a real app, you would track the actual duration
@@ -106,11 +130,14 @@ const TranscriptionActions = ({
 
   const handleEditSubmit = () => {
     onEdit(editedText);
+    // Update the title in the parent component if needed
+    // This would require extending the onEdit function to accept a title parameter
     setIsEditDialogOpen(false);
   };
 
   const handleEditOpen = () => {
     setEditedText(transcriptionText);
+    setEditedTitle(recordingTitle);
     setIsEditDialogOpen(true);
   };
 
@@ -126,7 +153,14 @@ const TranscriptionActions = ({
                 variant="outline"
                 className="flex-1 min-w-[80px] bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20 hover:bg-gradient-to-br hover:from-purple-500/20 hover:to-blue-500/20 transition-all duration-300"
               >
-                <Copy className="h-5 w-5 mr-2" />
+                {useCustomIcons ? (
+                  <FontAwesomeIcon
+                    icon={faCopy}
+                    className={`h-5 w-5 mr-2 ${iconColor}`}
+                  />
+                ) : (
+                  <Copy className="h-5 w-5 mr-2" />
+                )}
                 Copy
               </Button>
             </TooltipTrigger>
@@ -145,7 +179,14 @@ const TranscriptionActions = ({
                 variant="outline"
                 className="flex-1 min-w-[80px] bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20 hover:bg-gradient-to-br hover:from-blue-500/20 hover:to-cyan-500/20 transition-all duration-300"
               >
-                <Share2 className="h-5 w-5 mr-2" />
+                {useCustomIcons ? (
+                  <FontAwesomeIcon
+                    icon={faShare}
+                    className={`h-5 w-5 mr-2 ${iconColor}`}
+                  />
+                ) : (
+                  <Share2 className="h-5 w-5 mr-2" />
+                )}
                 Share
               </Button>
             </TooltipTrigger>
@@ -164,7 +205,14 @@ const TranscriptionActions = ({
                 variant="outline"
                 className="flex-1 min-w-[80px] bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20 hover:bg-gradient-to-br hover:from-green-500/20 hover:to-emerald-500/20 transition-all duration-300"
               >
-                <Save className="h-5 w-5 mr-2" />
+                {useCustomIcons ? (
+                  <FontAwesomeIcon
+                    icon={faSave}
+                    className={`h-5 w-5 mr-2 ${iconColor}`}
+                  />
+                ) : (
+                  <Save className="h-5 w-5 mr-2" />
+                )}
                 Save
               </Button>
             </TooltipTrigger>
@@ -182,7 +230,14 @@ const TranscriptionActions = ({
               variant="outline"
               className="flex-1 min-w-[80px] bg-gradient-to-br from-amber-500/10 to-yellow-500/10 border-amber-500/20 hover:bg-gradient-to-br hover:from-amber-500/20 hover:to-yellow-500/20 transition-all duration-300"
             >
-              <Edit className="h-5 w-5 mr-2" />
+              {useCustomIcons ? (
+                <FontAwesomeIcon
+                  icon={faEdit}
+                  className={`h-5 w-5 mr-2 ${iconColor}`}
+                />
+              ) : (
+                <Edit className="h-5 w-5 mr-2" />
+              )}
               Edit
             </Button>
           </DialogTrigger>
@@ -193,10 +248,23 @@ const TranscriptionActions = ({
                 Make changes to your transcription below.
               </DialogDescription>
             </DialogHeader>
+            <div className="mb-4">
+              <label htmlFor="title" className="text-sm font-medium block mb-2">
+                Title
+              </label>
+              <input
+                id="title"
+                type="text"
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+                placeholder="Enter recording title"
+                className="w-full p-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
             <Textarea
               value={editedText}
               onChange={(e) => setEditedText(e.target.value)}
-              className="min-h-[200px]"
+              className={`min-h-[200px] ${textSize}`}
             />
             <DialogFooter>
               <Button
@@ -218,7 +286,14 @@ const TranscriptionActions = ({
                 variant="outline"
                 className="flex-1 min-w-[80px] bg-gradient-to-br from-pink-500/10 to-rose-500/10 border-pink-500/20 hover:bg-gradient-to-br hover:from-pink-500/20 hover:to-rose-500/20 transition-all duration-300"
               >
-                <Mic className="h-5 w-5 mr-2" />
+                {useCustomIcons ? (
+                  <FontAwesomeIcon
+                    icon={faMicrophone}
+                    className={`h-5 w-5 mr-2 ${iconColor}`}
+                  />
+                ) : (
+                  <Mic className="h-5 w-5 mr-2" />
+                )}
                 New
               </Button>
             </TooltipTrigger>

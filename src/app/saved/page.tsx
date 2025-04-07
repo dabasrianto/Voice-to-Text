@@ -33,6 +33,7 @@ import { useTheme } from "next-themes";
 interface Transcription {
   id: string;
   text: string;
+  title?: string;
   date: string;
   language: string;
   duration: string;
@@ -86,7 +87,7 @@ export default function SavedTranscriptionsPage() {
     if (editingTranscription) {
       const updatedTranscriptions = savedTranscriptions.map((item) =>
         item.id === editingTranscription.id
-          ? { ...item, text: editedText }
+          ? { ...item, text: editedText, title: editingTranscription.title }
           : item,
       );
       setSavedTranscriptions(updatedTranscriptions);
@@ -163,19 +164,25 @@ export default function SavedTranscriptionsPage() {
               >
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center space-x-2">
-                      <Badge
-                        variant="outline"
-                        className="bg-purple-900/30 text-purple-300 border-purple-700"
-                      >
-                        {transcription.language}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {transcription.date}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {transcription.duration}
-                      </span>
+                    <div className="flex flex-col space-y-1 w-full">
+                      <div className="font-medium text-sm">
+                        {transcription.title ||
+                          `Recording ${transcription.date}`}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge
+                          variant="outline"
+                          className="bg-purple-900/30 text-purple-300 border-purple-700 dark:bg-purple-950/50 dark:text-purple-200"
+                        >
+                          {transcription.language}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {transcription.date}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {transcription.duration}
+                        </span>
+                      </div>
                     </div>
                     <div className="flex space-x-1">
                       <Button
@@ -266,6 +273,26 @@ export default function SavedTranscriptionsPage() {
               Make changes to your transcription below.
             </DialogDescription>
           </DialogHeader>
+          <div className="mb-4">
+            <label
+              htmlFor="edit-title"
+              className="text-sm font-medium block mb-2"
+            >
+              Title
+            </label>
+            <input
+              id="edit-title"
+              type="text"
+              value={editingTranscription?.title || ""}
+              onChange={(e) =>
+                setEditingTranscription((prev) =>
+                  prev ? { ...prev, title: e.target.value } : null,
+                )
+              }
+              placeholder="Enter recording title"
+              className="w-full p-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
           <Textarea
             value={editedText}
             onChange={(e) => setEditedText(e.target.value)}
